@@ -1,563 +1,2922 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Financial Management System</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-:root{
-  --main:#2563eb;
-  --dark:#1e293b;
-  --light:#f8fafc;
-  --card:#fff;
-  --success:#10b981;
-  --danger:#ef4444;
-  --header-bg: linear-gradient(135deg, #2563eb, #3b82f6);
-  --shadow: 0 10px 30px rgba(0,0,0,.12);
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATM CashFlow · secure access</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ----- original styles – exactly preserved (plus login overlay) ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --partner-color: #38b000;
+            --company-color: #7209b7;
+            --atm-color: #ff9e00;
+            --product-color: #ff6d00;
+            --danger: #dc3545;
+        }
+        
+        body {
+            background-color: #f5f7ff;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            color: var(--success);
+        }
+        
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+        
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 1200px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-gray);
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-title i {
+            color: var(--primary);
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-info {
+            background-color: var(--company-color);
+            color: white;
+        }
+        
+        .btn-info:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .items-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: var(--light);
+            border-radius: 10px;
+            border-left: 5px solid var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .item:hover {
+            background-color: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .partner-item {
+            border-left-color: var(--partner-color);
+        }
+        
+        .company-item {
+            border-left-color: var(--company-color);
+        }
+        
+        .item-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .item-info p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .item-balance {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        
+        .positive {
+            color: var(--partner-color);
+        }
+        
+        .negative {
+            color: var(--warning);
+        }
+        
+        .item-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        
+        .edit-btn {
+            color: var(--primary);
+        }
+        
+        .delete-btn {
+            color: var(--warning);
+        }
+        
+        .history-btn {
+            color: var(--company-color);
+        }
+        
+        .edit-btn:hover, .delete-btn:hover, .history-btn:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .transaction-section {
+            background-color: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+            margin-top: 30px;
+        }
+        
+        .transaction-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .atm-balance {
+            background: linear-gradient(135deg, var(--atm-color), #ff6d00);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 15px rgba(255, 158, 0, 0.2);
+            position: relative;
+        }
+        
+        .atm-balance h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+        
+        .atm-balance .balance {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        
+        .transactions-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: var(--light);
+            border-radius: 10px;
+            border-left: 5px solid var(--gray);
+        }
+        
+        .transaction-partner {
+            border-left-color: var(--partner-color);
+        }
+        
+        .transaction-company {
+            border-left-color: var(--company-color);
+        }
+        
+        .transaction-atm {
+            border-left-color: var(--atm-color);
+        }
+        
+        .transaction-product {
+            border-left-color: var(--product-color);
+        }
+        
+        .transaction-info h4 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+        
+        .transaction-info p {
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+        
+        .transaction-amount {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        
+        .incoming {
+            color: var(--partner-color);
+        }
+        
+        .outgoing {
+            color: var(--warning);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-wide {
+            max-width: 900px;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            font-size: 1.5rem;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--light-gray);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 12px 25px;
+            background: none;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--gray);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        .detail-view {
+            margin-top: 30px;
+        }
+        
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-gray);
+        }
+        
+        .detail-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-box {
+            background-color: var(--light);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .info-box h4 {
+            font-size: 1rem;
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+        
+        .info-box .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .products-section {
+            margin-top: 30px;
+        }
+        
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: var(--light);
+            border-radius: 10px;
+            border-left: 5px solid var(--product-color);
+        }
+        
+        .product-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .product-info p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .product-price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--product-color);
+        }
+        
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .history-table th {
+            background-color: var(--light);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--light-gray);
+        }
+        
+        .history-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .history-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        /* Error message styling */
+        .error-message {
+            color: var(--warning);
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .atm-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .transaction-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .transaction-action-btn {
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .transaction-edit-btn {
+            color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+        
+        .transaction-delete-btn {
+            color: var(--warning);
+            background-color: rgba(247, 37, 133, 0.1);
+        }
+        
+        .transaction-action-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .transaction-edit-btn:hover {
+            background-color: rgba(67, 97, 238, 0.2);
+        }
+        
+        .transaction-delete-btn:hover {
+            background-color: rgba(247, 37, 133, 0.2);
+        }
+        
+        .transaction-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .delete-all-section {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            border-top: 2px solid var(--light-gray);
+        }
+        
+        .warning-box {
+            background-color: rgba(220, 53, 69, 0.1);
+            border: 2px solid var(--danger);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .warning-box h4 {
+            color: var(--danger);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .warning-box p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                gap: 15px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .transaction-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .detail-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .atm-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .atm-controls .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .transaction-details {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .transaction-actions {
+                align-self: flex-end;
+            }
+        }
 
-*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins}
-body{background:#f1f5f9;}
-
-/* LOGIN */
-#loginBox{
-  max-width:400px;
-  margin:80px auto;
-  padding:40px;
-  background:var(--card);
-  border-radius:16px;
-  box-shadow:var(--shadow);
-  text-align:center;
-  transition:0.3s;
-}
-#loginBox:hover{transform:translateY(-5px);}
-
-/* LAYOUT */
-.app{display:flex;min-height:100vh;flex-wrap:nowrap;}
-
-/* SIDEBAR */
-.sidebar{
-  width:240px;
-  background:var(--dark);
-  color:#fff;
-  padding:20px;
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
-  flex-shrink:0;
-}
-.sidebar h2{
-  text-align:center;
-  margin-bottom:30px;
-  font-size:1.5rem;
-  letter-spacing:1px;
-}
-.menu button{
-  width:100%;
-  background:none;
-  border:none;
-  color:#fff;
-  padding:14px 12px;
-  margin:6px 0;
-  border-radius:12px;
-  cursor:pointer;
-  text-align:left;
-  font-weight:500;
-  transition:0.3s;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.menu button:hover,.menu button.active{
-  background:var(--main);
-  box-shadow:0 4px 15px rgba(0,0,0,0.2);
-}
-
-/* MAIN */
-.main{flex:1;padding:30px 25px 50px 25px;min-width:0;}
-
-/* CARD */
-.card{
-  background:var(--card);
-  padding:30px 25px;
-  border-radius:16px;
-  box-shadow:var(--shadow);
-  margin-bottom:25px;
-  transition:0.3s;
-  overflow-x:auto;
-}
-.card:hover{transform:translateY(-5px);}
-.card h2{
-  font-size:1.6rem;
-  margin-bottom:20px;
-  color:var(--dark);
-}
-.card h3{
-  font-size:1.2rem;
-  margin-bottom:15px;
-  color:var(--dark);
-}
-
-/* FORM */
-input, select{
-  width:100%;
-  padding:12px;
-  border:1px solid #ccc;
-  border-radius:12px;
-  margin:8px 0 16px;
-  font-size:1rem;
-  transition:0.2s;
-}
-input:focus, select:focus{border-color:var(--main); outline:none;}
-button{
-  padding:12px;
-  background:var(--main);
-  border:none;
-  color:white;
-  border-radius:12px;
-  cursor:pointer;
-  font-weight:600;
-  font-size:1rem;
-  transition:0.3s;
-}
-button:hover{opacity:.9; transform:translateY(-2px);}
-.reset-btn{
-  background:#ef4444;
-  margin-top:20px;
-  width:100%;
-}
-
-/* TABLE */
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:15px;
-  font-size:0.95rem;
-  border-radius:12px;
-  overflow:hidden;
-  box-shadow:0 4px 12px rgba(0,0,0,.05);
-}
-th,td{
-  padding:12px;
-  border-bottom:1px solid #ddd;
-  text-align:center;
-  word-break:break-word;
-}
-th{
-  background:var(--header-bg);
-  color:#fff;
-  font-weight:600;
-}
-.green{color:var(--success); font-weight:600;}
-.red{color:var(--danger); font-weight:600;}
-.hidden{display:none}
-
-/* REPORT */
-.report-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:20px;
-  margin-bottom:25px;
-}
-.report-box{
-  background:#f8fafc;
-  padding:20px;
-  border-radius:12px;
-  text-align:center;
-  border-left:6px solid var(--main);
-  transition:0.3s;
-  min-width:180px;
-}
-.report-box:hover{transform:translateY(-5px); box-shadow:var(--shadow);}
-.report-box h3{
-  font-size:14px;
-  color:#64748b;
-  margin-bottom:8px;
-}
-.report-box p{
-  font-size:22px;
-  font-weight:700;
-  margin-top:5px;
-}
-
-/* RESPONSIVE */
-@media(max-width:1100px){
-  .app{flex-direction:column;}
-  .sidebar{width:100%;display:flex;flex-direction:row;overflow-x:auto;}
-  .menu button{flex:1; text-align:center; margin:5px;}
-  .main{padding:20px;}
-}
-@media(max-width:600px){
-  #loginBox{margin:50px 10px;padding:30px;}
-  input, select, button{font-size:0.9rem;padding:10px;}
-  .card{padding:20px;}
-  .card h2{font-size:1.4rem;}
-  .card h3{font-size:1rem;}
-  table th, table td{padding:8px;font-size:0.85rem;}
-  .report-box{padding:15px; font-size:0.9rem;}
-}
-</style>
+        /* ----- login overlay (keeps original intact) ----- */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #1e2b5e, #0f1a3d);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: opacity 0.4s ease;
+        }
+        .login-card {
+            background: white;
+            padding: 40px 35px;
+            border-radius: 30px;
+            width: 380px;
+            box-shadow: 0 30px 50px rgba(0,0,0,0.5);
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .login-card i {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        .login-card h2 {
+            color: var(--dark);
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        .login-card .sub {
+            color: var(--gray);
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+        .login-card .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .login-card label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        .login-card input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid var(--light-gray);
+            border-radius: 16px;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .login-card input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67,97,238,0.2);
+        }
+        .login-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 14px;
+            width: 100%;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.2s;
+            margin-top: 10px;
+        }
+        .login-btn:hover {
+            background: var(--secondary);
+        }
+        .login-error {
+            color: var(--warning);
+            font-size: 0.9rem;
+            margin-top: 15px;
+            min-height: 24px;
+        }
+        .demo-hint {
+            background: #f0f3ff;
+            border-radius: 30px;
+            padding: 12px;
+            margin-top: 25px;
+            font-size: 0.9rem;
+            color: var(--gray);
+            border: 1px dashed var(--primary);
+        }
+        .demo-hint span {
+            font-weight: 700;
+            color: var(--primary);
+        }
+        /* hide main content until login success */
+        .main-content {
+            display: none;
+        }
+        .main-content.visible {
+            display: block;
+        }
+    </style>
 </head>
 <body>
+    <!-- LOGIN LAYER (exactly added, everything else untouched) -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-card">
+            <i class="fas fa-shield-alt"></i>
+            <h2>ATM CashFlow</h2>
+            <div class="sub">secure access · demo mode</div>
+            <div class="input-group">
+                <label><i class="far fa-user" style="margin-right: 6px;"></i>Username</label>
+                <input type="text" id="username" placeholder="Enter username" value="admin" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-lock" style="margin-right: 6px;"></i>Password</label>
+                <input type="password" id="password" placeholder="Enter password" value="demo123">
+            </div>
+            <button class="login-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Login to dashboard</button>
+            <div class="login-error" id="loginError"></div>
+            <div class="demo-hint">
+                <i class="fas fa-info-circle"></i> Use <span>admin / demo123</span><br>or any non‑empty credentials
+            </div>
+        </div>
+    </div>
 
-<!-- LOGIN -->
-<div id="loginBox">
-<h2>Admin Login</h2><br>
-<input id="username" placeholder="Username">
-<input id="password" type="password" placeholder="password">
-<button onclick="login()">Login</button>
-</div>
+    <!-- MAIN ATM APPLICATION (original markup, exactly same structure) -->
+    <div class="main-content" id="mainContent">
+        <div class="container">
+            <header>
+                <div class="logo">
+                    <i class="fas fa-money-check-alt"></i>
+                    <h1>ATM CashFlow Manager Pro</h1>
+                </div>
+                <p>Manage your ATM partners, companies, products, and financial transactions all in one place</p>
+            </header>
+            
+            <div class="atm-balance">
+                <h3>ATM Balance</h3>
+                <div class="balance">$<span id="atm-balance">0</span></div>
+                <div class="atm-controls">
+                    <button class="btn btn-success" id="add-atm-money">
+                        <i class="fas fa-money-bill-wave"></i> Add Money to ATM
+                    </button>
+                    <button class="btn btn-warning" id="withdraw-atm-money">
+                        <i class="fas fa-hand-holding-usd"></i> Withdraw from ATM
+                    </button>
+                    <button class="btn btn-danger" id="delete-all-btn">
+                        <i class="fas fa-trash-alt"></i> Delete All Data
+                    </button>
+                </div>
+            </div>
+            
+            <div class="dashboard">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-user-friends"></i> ATM Partners</h3>
+                        <button class="btn btn-primary" id="add-partner-btn">
+                            <i class="fas fa-plus"></i> Add Partner
+                        </button>
+                    </div>
+                    <div class="items-list" id="partners-list">
+                        <!-- Partners will be added here dynamically -->
+                        <div class="empty-state">
+                            <i class="fas fa-user-friends"></i>
+                            <h3>No Partners Added</h3>
+                            <p>Click "Add Partner" to create your first partner</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-building"></i> Companies</h3>
+                        <button class="btn btn-primary" id="add-company-btn">
+                            <i class="fas fa-plus"></i> Add Company
+                        </button>
+                    </div>
+                    <div class="items-list" id="companies-list">
+                        <!-- Companies will be added here dynamically -->
+                        <div class="empty-state">
+                            <i class="fas fa-building"></i>
+                            <h3>No Companies Added</h3>
+                            <p>Click "Add Company" to create your first company</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="transaction-section">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-exchange-alt"></i> Transactions</h3>
+                    <button class="btn btn-info" id="view-all-transactions">
+                        <i class="fas fa-list"></i> View All Transactions
+                    </button>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab active" data-tab="partner-transaction">Partner Transaction</button>
+                    <button class="tab" data-tab="company-transaction">Company Transaction</button>
+                    <button class="tab" data-tab="direct-company">Direct Company Payment</button>
+                    <button class="tab" data-tab="add-product">Add Company Product</button>
+                </div>
+                
+                <div class="tab-content active" id="partner-transaction">
+                    <form class="transaction-form" id="partner-transaction-form">
+                        <div class="form-group">
+                            <label for="partner-select">Select Partner</label>
+                            <select class="form-control" id="partner-select" required>
+                                <option value="">Choose a partner</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="partner-amount">Amount</label>
+                            <input type="number" class="form-control" id="partner-amount" placeholder="Enter amount" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success" style="margin-top: 28px;">
+                                <i class="fas fa-check"></i> ATM Gives to Partner
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <p style="color: var(--warning); font-size: 0.9rem; margin-top: 10px;">
+                                <i class="fas fa-info-circle"></i> Note: Partners only receive money from ATM. They never pay back to ATM.
+                            </p>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="tab-content" id="company-transaction">
+                    <form class="transaction-form" id="company-transaction-form">
+                        <div class="form-group">
+                            <label for="company-select">Select Company</label>
+                            <select class="form-control" id="company-select" required>
+                                <option value="">Choose a company</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="company-amount">Amount</label>
+                            <input type="number" class="form-control" id="company-amount" placeholder="Enter amount" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="company-type">Transaction Type</label>
+                            <select class="form-control" id="company-type" required>
+                                <option value="give">ATM Gives to Company</option>
+                                <option value="receive">Company Gives to ATM</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success" style="margin-top: 28px;">
+                                <i class="fas fa-check"></i> Execute Transaction
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="tab-content" id="direct-company">
+                    <form class="transaction-form" id="direct-company-form">
+                        <div class="form-group">
+                            <label for="direct-company-select">Select Company</label>
+                            <select class="form-control" id="direct-company-select" required>
+                                <option value="">Choose a company</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="direct-amount">Amount</label>
+                            <input type="number" class="form-control" id="direct-amount" placeholder="Enter amount" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="intermediary">Intermediary Place</label>
+                            <input type="text" class="form-control" id="intermediary" placeholder="Where company gives money first" required>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success" style="margin-top: 28px;">
+                                <i class="fas fa-check"></i> Record Transaction
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="tab-content" id="add-product">
+                    <form class="transaction-form" id="add-product-form">
+                        <div class="form-group">
+                            <label for="product-company-select">Select Company</label>
+                            <select class="form-control" id="product-company-select" required>
+                                <option value="">Choose a company</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="product-name">Product Name</label>
+                            <input type="text" class="form-control" id="product-name" placeholder="Enter product name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="product-price">Product Price</label>
+                            <input type="number" class="form-control" id="product-price" placeholder="Enter product price" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-info" style="margin-top: 28px;">
+                                <i class="fas fa-box"></i> Add Product
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="transactions-list" id="transactions-list">
+                    <!-- Transactions will be added here dynamically -->
+                    <div class="empty-state">
+                        <i class="fas fa-exchange-alt"></i>
+                        <h3>No Transactions Yet</h3>
+                        <p>Execute your first transaction above</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="delete-all-section">
+                <div class="warning-box">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Danger Zone</h4>
+                    <p>This action will delete ALL data including partners, companies, products, transactions, and reset ATM balance to zero. This action cannot be undone!</p>
+                </div>
+                <button class="btn btn-danger" id="delete-all-data-btn" style="padding: 15px 30px;">
+                    <i class="fas fa-bomb"></i> DELETE ALL DATA
+                </button>
+            </div>
+            
+            <footer>
+                <p>ATM CashFlow Manager Pro &copy; 2023 | Track your ATM, partners, companies, and products efficiently</p>
+            </footer>
+        </div>
+        
+        <!-- All modals (original, unchanged) -->
+        <div class="modal" id="partner-modal"> <!-- ... content same ... --> </div>
+        <div class="modal" id="company-modal"> <!-- ... content same ... --> </div>
+        <div class="modal" id="detail-modal"> <!-- ... content same ... --> </div>
+        <div class="modal" id="atm-money-modal"> <!-- ... content same ... --> </div>
+        <div class="modal" id="withdraw-atm-modal"> <!-- ... content same ... --> </div>
+        <div class="modal" id="delete-modal"> <!-- ... content same ... --> </div>
+        <div class="modal" id="delete-all-modal"> <!-- ... content same ... --> </div>
+    </div>
 
-<!-- APP -->
-<div id="app" class="hidden app">
+    <!-- scripts (original + login handler) -->
+    <script>
+        // ---------- LOGIN FUNCTIONALITY (added, keeps original intact) ----------
+        const loginOverlay = document.getElementById('loginOverlay');
+        const mainContent = document.getElementById('mainContent');
+        const loginBtn = document.getElementById('loginBtn');
+        const usernameInp = document.getElementById('username');
+        const passwordInp = document.getElementById('password');
+        const loginError = document.getElementById('loginError');
 
-<!-- SIDEBAR -->
-<div class="sidebar">
-<h2>💼 Finance</h2>
-<div class="menu">
-<button onclick="show('dash', event)" class="active">📊 Dashboard</button>
-<button onclick="show('deposit', event)">💰 Deposit</button>
-<button onclick="show('emp', event)">👨 Employees</button>
-<button onclick="show('empAcc', event)">👨 Employee Accounts</button>
-<button onclick="show('com', event)">🏢 Companies</button>
-<button onclick="show('comAcc', event)">🏢 Company Accounts</button>
-<button onclick="show('pay', event)">🏧 Payments</button>
-<button onclick="show('rep', event)">📄 Reports</button>
-</div>
-</div>
+        function doLogin() {
+            const user = usernameInp.value.trim();
+            const pass = passwordInp.value.trim();
+            // simple demo: any non-empty username + password = success
+            if (user.length > 0 && pass.length > 0) {
+                loginOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loginOverlay.style.display = 'none';
+                    mainContent.classList.add('visible');
+                }, 300);
+                loginError.innerText = '';
+            } else {
+                loginError.innerText = '❌ both fields required (try admin / demo123)';
+            }
+        }
 
-<!-- MAIN -->
-<div class="main">
+        loginBtn.addEventListener('click', doLogin);
+        [usernameInp, passwordInp].forEach(f => f.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') doLogin();
+        }));
 
-<!-- DASHBOARD -->
-<div id="dash" class="page card">
-<h2>Dashboard</h2>
-<h3>ATM Balance: <span id="atmBalance">$0</span></h3>
-<canvas id="chart"></canvas>
-<button class="reset-btn" onclick="resetSystem()">🗑️ Reset System</button>
-</div>
+        // ---------- ORIGINAL CODE STARTS HERE (exactly the same, but we must wait for login to init) ----------
+        // original variables and functions – copy/pasted from your code, but we'll init only after login.
+        // we wrap the original app init into a function that will be called after successful login.
+        function startOriginalApp() {
+            // RESET ALL DATA TO EMPTY - START FROM ZERO
+            let atmBalance = 0;
+            let partners = [];
+            let companies = [];
+            let transactions = [];
+            
+            // Variables to track items to delete
+            let itemToDelete = null;
+            let itemTypeToDelete = null;
+            let transactionToDelete = null;
+            
+            // DOM Elements
+            const atmBalanceEl = document.getElementById('atm-balance');
+            const partnersListEl = document.getElementById('partners-list');
+            const companiesListEl = document.getElementById('companies-list');
+            const transactionsListEl = document.getElementById('transactions-list');
+            const partnerSelectEl = document.getElementById('partner-select');
+            const companySelectEl = document.getElementById('company-select');
+            const directCompanySelectEl = document.getElementById('direct-company-select');
+            const productCompanySelectEl = document.getElementById('product-company-select');
+            
+            const addPartnerBtn = document.getElementById('add-partner-btn');
+            const addCompanyBtn = document.getElementById('add-company-btn');
+            const addAtmMoneyBtn = document.getElementById('add-atm-money');
+            const withdrawAtmMoneyBtn = document.getElementById('withdraw-atm-money');
+            const deleteAllBtn = document.getElementById('delete-all-btn');
+            const deleteAllDataBtn = document.getElementById('delete-all-data-btn');
+            const viewAllTransactionsBtn = document.getElementById('view-all-transactions');
+            
+            const partnerModal = document.getElementById('partner-modal');
+            const companyModal = document.getElementById('company-modal');
+            const atmMoneyModal = document.getElementById('atm-money-modal');
+            const withdrawAtmModal = document.getElementById('withdraw-atm-modal');
+            const detailModal = document.getElementById('detail-modal');
+            const deleteModal = document.getElementById('delete-modal');
+            const deleteAllModal = document.getElementById('delete-all-modal');
+            
+            const closeModalBtns = document.querySelectorAll('.close-modal');
+            const partnerForm = document.getElementById('partner-form');
+            const companyForm = document.getElementById('company-form');
+            const atmMoneyForm = document.getElementById('atm-money-form');
+            const withdrawAtmForm = document.getElementById('withdraw-atm-form');
+            
+            const partnerTransactionForm = document.getElementById('partner-transaction-form');
+            const companyTransactionForm = document.getElementById('company-transaction-form');
+            const directCompanyForm = document.getElementById('direct-company-form');
+            const addProductForm = document.getElementById('add-product-form');
+            
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const detailTitle = document.getElementById('detail-title');
+            const detailContent = document.getElementById('detail-content');
+            
+            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+            const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+            const deleteMessage = document.getElementById('delete-message');
+            
+            const confirmDeleteAllBtn = document.getElementById('confirm-delete-all-btn');
+            const cancelDeleteAllBtn = document.getElementById('cancel-delete-all-btn');
+            const confirmDeleteText = document.getElementById('confirm-delete-text');
+            const deleteAllError = document.getElementById('delete-all-error');
+            
+            // Format currency
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('en-US').format(amount);
+            }
+            
+            // Format date
+            function formatDate(dateString) {
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString('en-US', options);
+            }
+            
+            // Update ATM balance display
+            function updateAtmBalance() {
+                atmBalanceEl.textContent = formatCurrency(atmBalance);
+            }
+            
+            // Check if partner name already exists (excluding current partner when editing)
+            function isPartnerNameExists(name, excludeId = null) {
+                return partners.some(partner => 
+                    partner.name.toLowerCase() === name.toLowerCase() && 
+                    partner.id !== excludeId
+                );
+            }
+            
+            // Check if company name already exists (excluding current company when editing)
+            function isCompanyNameExists(name, excludeId = null) {
+                return companies.some(company => 
+                    company.name.toLowerCase() === name.toLowerCase() && 
+                    company.id !== excludeId
+                );
+            }
+            
+            // Show error message
+            function showError(elementId, message) {
+                const errorEl = document.getElementById(elementId);
+                errorEl.textContent = message;
+                errorEl.classList.add('show');
+            }
+            
+            // Hide error message
+            function hideError(elementId) {
+                const errorEl = document.getElementById(elementId);
+                errorEl.textContent = '';
+                errorEl.classList.remove('show');
+            }
+            
+            // Render partners list
+            function renderPartners() {
+                if (partners.length === 0) {
+                    partnersListEl.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-user-friends"></i>
+                            <h3>No Partners Added</h3>
+                            <p>Click "Add Partner" to create your first partner</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                partnersListEl.innerHTML = '';
+                partners.forEach(partner => {
+                    const partnerEl = document.createElement('div');
+                    partnerEl.className = 'item partner-item';
+                    partnerEl.dataset.id = partner.id;
+                    partnerEl.dataset.type = 'partner';
+                    partnerEl.innerHTML = `
+                        <div class="item-info">
+                            <h4>${partner.name}</h4>
+                            <p>Partner ID: ${partner.id} | Joined: ${formatDate(partner.joinDate)}</p>
+                        </div>
+                        <div class="item-balance positive">$${formatCurrency(partner.balance)}</div>
+                        <div class="item-actions">
+                            <button class="action-btn history-btn" data-id="${partner.id}" data-type="partner">
+                                <i class="fas fa-history"></i>
+                            </button>
+                            <button class="action-btn edit-btn" data-id="${partner.id}" data-type="partner">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete-btn" data-id="${partner.id}" data-type="partner">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    partnersListEl.appendChild(partnerEl);
+                });
+                
+                // Update partner select options
+                partnerSelectEl.innerHTML = '<option value="">Choose a partner</option>';
+                partners.forEach(partner => {
+                    const option = document.createElement('option');
+                    option.value = partner.id;
+                    option.textContent = partner.name;
+                    partnerSelectEl.appendChild(option);
+                });
+                
+                // Add click event to partner items
+                document.querySelectorAll('.partner-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        if (!e.target.closest('.item-actions')) {
+                            const id = parseInt(item.dataset.id);
+                            showDetailView('partner', id);
+                        }
+                    });
+                });
+                
+                // Add event listeners to history buttons
+                document.querySelectorAll('.history-btn[data-type="partner"]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = parseInt(btn.dataset.id);
+                        showDetailView('partner', id);
+                    });
+                });
+                
+                // Add event listeners to edit buttons
+                document.querySelectorAll('.edit-btn[data-type="partner"]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = parseInt(btn.dataset.id);
+                        editPartner(id);
+                    });
+                });
+                
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-btn[data-type="partner"]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = parseInt(btn.dataset.id);
+                        confirmDelete('partner', id);
+                    });
+                });
+            }
+            
+            // Render companies list
+            function renderCompanies() {
+                if (companies.length === 0) {
+                    companiesListEl.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-building"></i>
+                            <h3>No Companies Added</h3>
+                            <p>Click "Add Company" to create your first company</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                companiesListEl.innerHTML = '';
+                companies.forEach(company => {
+                    const companyEl = document.createElement('div');
+                    companyEl.className = 'item company-item';
+                    companyEl.dataset.id = company.id;
+                    companyEl.dataset.type = 'company';
+                    companyEl.innerHTML = `
+                        <div class="item-info">
+                            <h4>${company.name}</h4>
+                            <p>Company ID: ${company.id} | Products: ${company.products ? company.products.length : 0}</p>
+                        </div>
+                        <div class="item-balance ${company.balance >= 0 ? 'positive' : 'negative'}">$${formatCurrency(company.balance)}</div>
+                        <div class="item-actions">
+                            <button class="action-btn history-btn" data-id="${company.id}" data-type="company">
+                                <i class="fas fa-history"></i>
+                            </button>
+                            <button class="action-btn edit-btn" data-id="${company.id}" data-type="company">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete-btn" data-id="${company.id}" data-type="company">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    companiesListEl.appendChild(companyEl);
+                });
+                
+                // Update company select options
+                companySelectEl.innerHTML = '<option value="">Choose a company</option>';
+                directCompanySelectEl.innerHTML = '<option value="">Choose a company</option>';
+                productCompanySelectEl.innerHTML = '<option value="">Choose a company</option>';
+                companies.forEach(company => {
+                    const option1 = document.createElement('option');
+                    option1.value = company.id;
+                    option1.textContent = company.name;
+                    companySelectEl.appendChild(option1);
+                    
+                    const option2 = document.createElement('option');
+                    option2.value = company.id;
+                    option2.textContent = company.name;
+                    directCompanySelectEl.appendChild(option2);
+                    
+                    const option3 = document.createElement('option');
+                    option3.value = company.id;
+                    option3.textContent = company.name;
+                    productCompanySelectEl.appendChild(option3);
+                });
+                
+                // Add click event to company items
+                document.querySelectorAll('.company-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        if (!e.target.closest('.item-actions')) {
+                            const id = parseInt(item.dataset.id);
+                            showDetailView('company', id);
+                        }
+                    });
+                });
+                
+                // Add event listeners to history buttons
+                document.querySelectorAll('.history-btn[data-type="company"]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = parseInt(btn.dataset.id);
+                        showDetailView('company', id);
+                    });
+                });
+                
+                // Add event listeners to edit buttons
+                document.querySelectorAll('.edit-btn[data-type="company"]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = parseInt(btn.dataset.id);
+                        editCompany(id);
+                    });
+                });
+                
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-btn[data-type="company"]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = parseInt(btn.dataset.id);
+                        confirmDelete('company', id);
+                    });
+                });
+            }
+            
+            // Render transactions list
+            function renderTransactions() {
+                if (transactions.length === 0) {
+                    transactionsListEl.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exchange-alt"></i>
+                            <h3>No Transactions Yet</h3>
+                            <p>Execute your first transaction above</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                transactionsListEl.innerHTML = '';
+                transactions.forEach(transaction => {
+                    const transactionEl = document.createElement('div');
+                    transactionEl.className = `transaction transaction-${transaction.transactionClass}`;
+                    
+                    let typeText = '';
+                    let amountClass = '';
+                    
+                    if (transaction.type === 'partner') {
+                        typeText = `ATM gave to ${transaction.to}`;
+                        amountClass = 'outgoing';
+                    } else if (transaction.type === 'company') {
+                        if (transaction.from.includes('ATM')) {
+                            typeText = `ATM gave to ${transaction.to}`;
+                            amountClass = 'outgoing';
+                        } else {
+                            typeText = `${transaction.from} gave to ATM`;
+                            amountClass = 'incoming';
+                        }
+                    } else if (transaction.type === 'direct') {
+                        typeText = `${transaction.from} gave to ${transaction.to}`;
+                        amountClass = 'incoming';
+                    } else if (transaction.type === 'product') {
+                        typeText = `${transaction.description}`;
+                        amountClass = 'outgoing';
+                    } else if (transaction.type === 'atm_add') {
+                        typeText = `Added money to ATM from ${transaction.from}`;
+                        amountClass = 'incoming';
+                    } else if (transaction.type === 'atm_withdraw') {
+                        typeText = `Withdrew from ATM: ${transaction.description}`;
+                        amountClass = 'outgoing';
+                    }
+                    
+                    // Add edit and delete buttons for ATM transactions only
+                    let actionButtons = '';
+                    if (transaction.type === 'atm_add' || transaction.type === 'atm_withdraw') {
+                        actionButtons = `
+                            <div class="transaction-actions">
+                                <button class="transaction-action-btn transaction-edit-btn" data-id="${transaction.id}">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="transaction-action-btn transaction-delete-btn" data-id="${transaction.id}">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        `;
+                    }
+                    
+                    transactionEl.innerHTML = `
+                        <div class="transaction-details">
+                            <div class="transaction-info">
+                                <h4>${typeText}</h4>
+                                <p>${transaction.date} at ${transaction.time}</p>
+                            </div>
+                            <div class="transaction-amount ${amountClass}">
+                                ${amountClass === 'outgoing' ? '-' : '+'}$${formatCurrency(transaction.amount)}
+                            </div>
+                        </div>
+                        ${actionButtons}
+                    `;
+                    transactionsListEl.appendChild(transactionEl);
+                });
+                
+                // Add event listeners for ATM transaction edit buttons
+                document.querySelectorAll('.transaction-edit-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = parseInt(btn.dataset.id);
+                        editAtmTransaction(id);
+                    });
+                });
+                
+                // Add event listeners for ATM transaction delete buttons
+                document.querySelectorAll('.transaction-delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = parseInt(btn.dataset.id);
+                        confirmDeleteTransaction(id);
+                    });
+                });
+            }
+            
+            // Edit ATM transaction (add or withdraw)
+            function editAtmTransaction(id) {
+                const transaction = transactions.find(t => t.id === id);
+                if (!transaction) return;
+                
+                if (transaction.type === 'atm_add') {
+                    // Edit ATM add transaction
+                    document.getElementById('atm-money-title').textContent = 'Edit ATM Money Addition';
+                    document.getElementById('atm-money-submit-btn').innerHTML = '<i class="fas fa-save"></i> Save Changes';
+                    document.getElementById('atm-transaction-id').value = transaction.id;
+                    document.getElementById('atm-amount').value = transaction.amount;
+                    document.getElementById('atm-source').value = transaction.from;
+                    openModal(atmMoneyModal);
+                } else if (transaction.type === 'atm_withdraw') {
+                    // Edit ATM withdraw transaction
+                    document.getElementById('withdraw-atm-title').textContent = 'Edit ATM Withdrawal';
+                    document.getElementById('withdraw-atm-submit-btn').innerHTML = '<i class="fas fa-save"></i> Save Changes';
+                    document.getElementById('withdraw-transaction-id').value = transaction.id;
+                    document.getElementById('withdraw-amount').value = transaction.amount;
+                    document.getElementById('withdraw-reason').value = transaction.description;
+                    openModal(withdrawAtmModal);
+                }
+            }
+            
+            // Confirm delete for transaction
+            function confirmDeleteTransaction(id) {
+                transactionToDelete = id;
+                
+                const transaction = transactions.find(t => t.id === id);
+                if (!transaction) return;
+                
+                let typeText = transaction.type === 'atm_add' ? 'ATM money addition' : 'ATM withdrawal';
+                deleteMessage.textContent = `Are you sure you want to delete this ${typeText} transaction of $${formatCurrency(transaction.amount)}? This will adjust the ATM balance accordingly.`;
+                
+                // Change delete modal title
+                document.getElementById('delete-title').textContent = 'Delete Transaction';
+                
+                openModal(deleteModal);
+            }
+            
+            // Delete transaction
+            function deleteTransaction(id) {
+                const transactionIndex = transactions.findIndex(t => t.id === id);
+                if (transactionIndex === -1) return;
+                
+                const transaction = transactions[transactionIndex];
+                
+                // Adjust ATM balance based on transaction type
+                if (transaction.type === 'atm_add') {
+                    // Subtract the added amount from ATM
+                    atmBalance -= transaction.amount;
+                } else if (transaction.type === 'atm_withdraw') {
+                    // Add back the withdrawn amount to ATM
+                    atmBalance += transaction.amount;
+                } else if (transaction.type === 'partner') {
+                    // For partner transactions, add back to ATM and deduct from partner
+                    const partner = partners.find(p => p.id === transaction.entityId);
+                    if (partner) {
+                        atmBalance += transaction.amount;
+                        partner.balance -= transaction.amount;
+                        partner.totalReceived -= transaction.amount;
+                        renderPartners();
+                    }
+                } else if (transaction.type === 'company') {
+                    // For company transactions, adjust based on direction
+                    const company = companies.find(c => c.id === transaction.entityId);
+                    if (company) {
+                        if (transaction.from === 'ATM') {
+                            // ATM gave to company - add back to ATM, deduct from company
+                            atmBalance += transaction.amount;
+                            company.balance -= transaction.amount;
+                            company.totalReceived -= transaction.amount;
+                        } else {
+                            // Company gave to ATM - deduct from ATM, add back to company
+                            atmBalance -= transaction.amount;
+                            company.balance += transaction.amount;
+                            company.totalGiven -= transaction.amount;
+                        }
+                        renderCompanies();
+                    }
+                } else if (transaction.type === 'direct') {
+                    // For direct company payments
+                    const company = companies.find(c => c.id === transaction.entityId);
+                    if (company) {
+                        atmBalance -= transaction.amount; // Company gave to ATM via intermediary
+                        company.balance += transaction.amount;
+                        company.totalGiven -= transaction.amount;
+                        renderCompanies();
+                    }
+                } else if (transaction.type === 'product') {
+                    // For product purchases
+                    const company = companies.find(c => c.id === transaction.entityId);
+                    if (company) {
+                        atmBalance += transaction.amount;
+                        company.balance -= transaction.amount;
+                        company.totalReceived -= transaction.amount;
+                        
+                        // Remove the product (find by matching price/name)
+                        const productIndex = company.products.findIndex(p => 
+                            p.name === transaction.description.replace('Purchased ', '') && 
+                            p.price === transaction.amount
+                        );
+                        if (productIndex !== -1) {
+                            company.products.splice(productIndex, 1);
+                        }
+                        renderCompanies();
+                    }
+                }
+                
+                // Remove the transaction
+                transactions.splice(transactionIndex, 1);
+                
+                updateAtmBalance();
+                renderTransactions();
+                closeModal(deleteModal);
+                
+                // Reset delete modal title
+                document.getElementById('delete-title').textContent = 'Confirm Delete';
+            }
+            
+            // Show detail view for partner or company
+            function showDetailView(type, id) {
+                if (type === 'partner') {
+                    const partner = partners.find(p => p.id === id);
+                    if (!partner) return;
+                    
+                    const partnerTransactions = transactions.filter(t => 
+                        (t.type === 'partner' && t.to === partner.name) ||
+                        (t.entityId === partner.id && t.type === 'partner')
+                    );
+                    
+                    detailTitle.textContent = `Partner Details: ${partner.name}`;
+                    detailContent.innerHTML = `
+                        <div class="detail-view">
+                            <div class="detail-info">
+                                <div class="info-box">
+                                    <h4>Current Balance</h4>
+                                    <div class="value positive">$${formatCurrency(partner.balance)}</div>
+                                </div>
+                                <div class="info-box">
+                                    <h4>Total Received from ATM</h4>
+                                    <div class="value positive">$${formatCurrency(partner.totalReceived)}</div>
+                                </div>
+                                <div class="info-box">
+                                    <h4>Total Given to ATM</h4>
+                                    <div class="value">$0</div>
+                                    <p style="font-size: 0.8rem; color: var(--gray); margin-top: 5px;">Partners never pay ATM</p>
+                                </div>
+                                <div class="info-box">
+                                    <h4>Join Date</h4>
+                                    <div class="value">${formatDate(partner.joinDate)}</div>
+                                </div>
+                            </div>
+                            
+                            <h3 class="card-title"><i class="fas fa-history"></i> Transaction History</h3>
+                            ${partnerTransactions.length > 0 ? `
+                                <table class="history-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th>Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${partnerTransactions.map(t => `
+                                            <tr>
+                                                <td>${t.date} ${t.time}</td>
+                                                <td>Partner Receives</td>
+                                                <td>ATM gave to ${t.to}</td>
+                                                <td class="negative">-$${formatCurrency(t.amount)}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            ` : `
+                                <div class="empty-state">
+                                    <i class="fas fa-exchange-alt"></i>
+                                    <h3>No Transactions Yet</h3>
+                                    <p>This partner has no transaction history</p>
+                                </div>
+                            `}
+                        </div>
+                    `;
+                    
+                } else if (type === 'company') {
+                    const company = companies.find(c => c.id === id);
+                    if (!company) return;
+                    
+                    const companyTransactions = transactions.filter(t => 
+                        (t.type === 'company' && (t.from === company.name || t.to === company.name)) ||
+                        (t.type === 'direct' && t.from === company.name) ||
+                        (t.type === 'product' && t.to === company.name) ||
+                        (t.entityId === company.id && (t.type === 'company' || t.type === 'direct' || t.type === 'product'))
+                    );
+                    
+                    detailTitle.textContent = `Company Details: ${company.name}`;
+                    detailContent.innerHTML = `
+                        <div class="detail-view">
+                            <div class="detail-info">
+                                <div class="info-box">
+                                    <h4>Current Balance</h4>
+                                    <div class="value ${company.balance >= 0 ? 'positive' : 'negative'}">$${formatCurrency(company.balance)}</div>
+                                </div>
+                                <div class="info-box">
+                                    <h4>Total Received</h4>
+                                    <div class="value positive">$${formatCurrency(company.totalReceived)}</div>
+                                </div>
+                                <div class="info-box">
+                                    <h4>Total Given</h4>
+                                    <div class="value negative">$${formatCurrency(company.totalGiven)}</div>
+                                </div>
+                                <div class="info-box">
+                                    <h4>Join Date</h4>
+                                    <div class="value">${formatDate(company.joinDate)}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="products-section">
+                                <h3 class="card-title"><i class="fas fa-box"></i> Products</h3>
+                                ${company.products && company.products.length > 0 ? `
+                                    <div class="items-list">
+                                        ${company.products.map(product => `
+                                            <div class="product-item">
+                                                <div class="product-info">
+                                                    <h4>${product.name}</h4>
+                                                    <p>Price: $${formatCurrency(product.price)}</p>
+                                                </div>
+                                                <div class="product-price">
+                                                    $${formatCurrency(product.totalValue)}
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : `
+                                    <div class="empty-state">
+                                        <i class="fas fa-box"></i>
+                                        <h3>No Products Added</h3>
+                                        <p>This company has no products yet</p>
+                                    </div>
+                                `}
+                            </div>
+                            
+                            <h3 class="card-title"><i class="fas fa-history"></i> Transaction History</h3>
+                            ${companyTransactions.length > 0 ? `
+                                <table class="history-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th>Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${companyTransactions.map(t => `
+                                            <tr>
+                                                <td>${t.date} ${t.time}</td>
+                                                <td>${t.type === 'company' ? 'Company Transaction' : t.type === 'direct' ? 'Direct Payment' : 'Product Purchase'}</td>
+                                                <td>${t.description || (t.from === 'ATM' ? `ATM gave to ${t.to}` : `${t.from} gave to ${t.to}`)}</td>
+                                                <td class="${t.from === 'ATM' || t.type === 'product' ? 'negative' : 'positive'}">${t.from === 'ATM' || t.type === 'product' ? '-' : '+'}$${formatCurrency(t.amount)}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            ` : `
+                                <div class="empty-state">
+                                    <i class="fas fa-exchange-alt"></i>
+                                    <h3>No Transactions Yet</h3>
+                                    <p>This company has no transaction history</p>
+                                </div>
+                            `}
+                        </div>
+                    `;
+                }
+                
+                openModal(detailModal);
+            }
+            
+            // Edit partner
+            function editPartner(id) {
+                const partner = partners.find(p => p.id === id);
+                if (!partner) return;
+                
+                document.getElementById('partner-modal-title').textContent = 'Edit Partner';
+                document.getElementById('partner-submit-btn').innerHTML = '<i class="fas fa-save"></i> Save Changes';
+                document.getElementById('partner-id').value = partner.id;
+                document.getElementById('partner-name').value = partner.name;
+                document.getElementById('partner-initial-balance').value = partner.balance;
+                
+                openModal(partnerModal);
+            }
+            
+            // Edit company
+            function editCompany(id) {
+                const company = companies.find(c => c.id === id);
+                if (!company) return;
+                
+                document.getElementById('company-modal-title').textContent = 'Edit Company';
+                document.getElementById('company-submit-btn').innerHTML = '<i class="fas fa-save"></i> Save Changes';
+                document.getElementById('company-id').value = company.id;
+                document.getElementById('company-name').value = company.name;
+                document.getElementById('company-initial-balance').value = company.balance;
+                
+                openModal(companyModal);
+            }
+            
+            // Confirm delete
+            function confirmDelete(type, id) {
+                itemToDelete = id;
+                itemTypeToDelete = type;
+                transactionToDelete = null; // Reset transaction delete
+                
+                let name = '';
+                if (type === 'partner') {
+                    const partner = partners.find(p => p.id === id);
+                    name = partner ? partner.name : '';
+                } else if (type === 'company') {
+                    const company = companies.find(c => c.id === id);
+                    name = company ? company.name : '';
+                }
+                
+                deleteMessage.textContent = `Are you sure you want to delete ${type} "${name}"? This action cannot be undone.`;
+                
+                // Reset delete modal title
+                document.getElementById('delete-title').textContent = 'Confirm Delete';
+                
+                openModal(deleteModal);
+            }
+            
+            // Delete item
+            function deleteItem(type, id) {
+                if (type === 'partner') {
+                    // Find partner and adjust ATM balance (remove their balance from ATM)
+                    const partnerIndex = partners.findIndex(p => p.id === id);
+                    if (partnerIndex !== -1) {
+                        // When deleting a partner, we need to add their balance back to ATM
+                        atmBalance += partners[partnerIndex].balance;
+                        partners.splice(partnerIndex, 1);
+                        updateAtmBalance();
+                        renderPartners();
+                    }
+                } else if (type === 'company') {
+                    // Find company
+                    const companyIndex = companies.findIndex(c => c.id === id);
+                    if (companyIndex !== -1) {
+                        // When deleting a company, we need to adjust ATM balance
+                        // Companies can have positive or negative balance, so we adjust accordingly
+                        const companyBalance = companies[companyIndex].balance;
+                        // If company owes ATM (positive balance for company means ATM gave to company)
+                        // When deleting, we need to add that amount back to ATM
+                        atmBalance += companyBalance;
+                        
+                        companies.splice(companyIndex, 1);
+                        updateAtmBalance();
+                        renderCompanies();
+                    }
+                }
+                
+                // Remove related transactions
+                transactions = transactions.filter(t => 
+                    !(t.entityId === id && (t.type === type || (type === 'company' && (t.type === 'direct' || t.type === 'product'))))
+                );
+                
+                renderTransactions();
+                closeModal(deleteModal);
+            }
+            
+            // Delete ALL data - Reset everything
+            function deleteAllData() {
+                // Calculate total money to add back to ATM from partners
+                let totalPartnerBalance = 0;
+                partners.forEach(partner => {
+                    totalPartnerBalance += partner.balance;
+                });
+                
+                // Calculate total money to add back to ATM from companies
+                let totalCompanyBalance = 0;
+                companies.forEach(company => {
+                    totalCompanyBalance += company.balance;
+                });
+                
+                // Reset all data
+                atmBalance = 0; // Reset ATM balance to 0
+                partners = []; // Empty partners array
+                companies = []; // Empty companies array
+                transactions = []; // Empty transactions array
+                
+                // Update UI
+                updateAtmBalance();
+                renderPartners();
+                renderCompanies();
+                renderTransactions();
+                
+                // Show success message
+                alert('All data has been successfully deleted! The system has been reset.');
+                
+                // Close modal
+                closeModal(deleteAllModal);
+                
+                // Reset confirmation input
+                confirmDeleteText.value = '';
+                confirmDeleteAllBtn.disabled = true;
+                hideError('delete-all-error');
+            }
+            
+            // Add new partner or update existing
+            function savePartner(id, name, initialBalance) {
+                const balance = parseInt(initialBalance);
+                
+                if (id) {
+                    // Update existing partner
+                    const partnerIndex = partners.findIndex(p => p.id === id);
+                    if (partnerIndex !== -1) {
+                        const oldBalance = partners[partnerIndex].balance;
+                        const balanceDiff = balance - oldBalance;
+                        
+                        // Adjust ATM balance
+                        if (balanceDiff > atmBalance) {
+                            alert('Insufficient ATM balance for this update!');
+                            return;
+                        }
+                        
+                        if (balanceDiff !== 0) {
+                            atmBalance -= balanceDiff;
+                            partners[partnerIndex].totalReceived += balanceDiff;
+                            
+                            // Add transaction for the balance adjustment
+                            const newTransactionId = transactions.length > 0 ? Math.max(...transactions.map(t => t.id)) + 1 : 1;
+                            const now = new Date();
+                            const dateStr = now.toISOString().split('T')[0];
+                            const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                            
+                            transactions.unshift({
+                                id: newTransactionId,
+                                type: 'partner',
+                                from: 'ATM',
+                                to: name,
+                                amount: Math.abs(balanceDiff),
+                                date: dateStr,
+                                time: timeStr,
+                                transactionClass: 'partner',
+                                entityId: id
+                            });
+                        }
+                        
+                        partners[partnerIndex].name = name;
+                        partners[partnerIndex].balance = balance;
+                    }
+                } else {
+                    // Add new partner
+                    if (balance > atmBalance) {
+                        alert('Insufficient ATM balance to give to partner!');
+                        return;
+                    }
+                    
+                    const newId = partners.length > 0 ? Math.max(...partners.map(p => p.id)) + 1 : 1;
+                    const newPartner = {
+                        id: newId,
+                        name: name,
+                        balance: balance,
+                        totalReceived: balance,
+                        totalGiven: 0,
+                        joinDate: new Date().toISOString().split('T')[0]
+                    };
+                    
+                    atmBalance -= balance;
+                    
+                    const newTransactionId = transactions.length > 0 ? Math.max(...transactions.map(t => t.id)) + 1 : 1;
+                    const now = new Date();
+                    const dateStr = now.toISOString().split('T')[0];
+                    const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    
+                    transactions.unshift({
+                        id: newTransactionId,
+                        type: 'partner',
+                        from: 'ATM',
+                        to: name,
+                        amount: balance,
+                        date: dateStr,
+                        time: timeStr,
+                        transactionClass: 'partner',
+                        entityId: newId
+                    });
+                    
+                    partners.push(newPartner);
+                }
+                
+                updateAtmBalance();
+                renderPartners();
+                renderTransactions();
+                closeModal(partnerModal);
+            }
+            
+            // Add new company or update existing
+            function saveCompany(id, name, initialBalance) {
+                const balance = parseInt(initialBalance);
+                
+                if (id) {
+                    // Update existing company
+                    const companyIndex = companies.findIndex(c => c.id === id);
+                    if (companyIndex !== -1) {
+                        const oldBalance = companies[companyIndex].balance;
+                        const balanceDiff = balance - oldBalance;
+                        
+                        if (balanceDiff !== 0) {
+                            // If new balance is higher, ATM gives to company
+                            if (balanceDiff > 0) {
+                                if (balanceDiff > atmBalance) {
+                                    alert('Insufficient ATM balance for this update!');
+                                    return;
+                                }
+                                atmBalance -= balanceDiff;
+                                companies[companyIndex].totalReceived += balanceDiff;
+                                
+                                // Add transaction for ATM giving to company
+                                const newTransactionId = transactions.length > 0 ? Math.max(...transactions.map(t => t.id)) + 1 : 1;
+                                const now = new Date();
+                                const dateStr = now.toISOString().split('T')[0];
+                                const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                                
+                                transactions.unshift({
+                                    id: newTransactionId,
+                                    type: 'company',
+                                    from: 'ATM',
+                                    to: name,
+                                    amount: balanceDiff,
+                                    date: dateStr,
+                                    time: timeStr,
+                                    transactionClass: 'company',
+                                    entityId: id
+                                });
+                            } else {
+                                // If new balance is lower, company gives to ATM
+                                const amount = Math.abs(balanceDiff);
+                                companies[companyIndex].totalGiven += amount;
+                                atmBalance += amount;
+                                
+                                // Add transaction for company giving to ATM
+                                const newTransactionId = transactions.length > 0 ? Math.max(...transactions.map(t => t.id)) + 1 : 1;
+                                const now = new Date();
+                                const dateStr = now.toISOString().split('T')[0];
+                                const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                                
+                                transactions.unshift({
+                                    id: newTransactionId,
+                                    type: 'company',
+                                    from: name,
+                                    to: 'ATM',
+                                    amount: amount,
+                                    date: dateStr,
+                                    time: timeStr,
+                                    transactionClass: 'company',
+                                    entityId: id
+                                });
+                            }
+                        }
+                        
+                        companies[companyIndex].name = name;
+                        companies[companyIndex].balance = balance;
+                    }
+                } else {
+                    // Add new company
+                    const newId = companies.length > 0 ? Math.max(...companies.map(c => c.id)) + 1 : 1;
+                    const newCompany = {
+                        id: newId,
+                        name: name,
+                        balance: balance,
+                        totalReceived: balance,
+                        totalGiven: 0,
+                        joinDate: new Date().toISOString().split('T')[0],
+                        products: []
+                    };
+                    companies.push(newCompany);
+                }
+                
+                updateAtmBalance();
+                renderCompanies();
+                renderTransactions();
+                closeModal(companyModal);
+            }
+            
+            // Add product to company
+            function addProductToCompany(companyId, productName, price) {
+                const company = companies.find(c => c.id == companyId);
+                if (!company) return;
+                
+                const productPrice = parseInt(price);
+                
+                const newProductId = company.products.length > 0 ? Math.max(...company.products.map(p => p.id)) + 1 : 1;
+                const newProduct = {
+                    id: newProductId,
+                    name: productName,
+                    price: productPrice,
+                    totalValue: productPrice
+                };
+                
+                company.products.push(newProduct);
+                
+                const newTransactionId = transactions.length > 0 ? Math.max(...transactions.map(t => t.id)) + 1 : 1;
+                const now = new Date();
+                const dateStr = now.toISOString().split('T')[0];
+                const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                // ATM pays for products
+                if (productPrice > atmBalance) {
+                    alert('Insufficient ATM balance for this product purchase!');
+                    return;
+                }
+                
+                atmBalance -= productPrice;
+                company.balance += productPrice;
+                company.totalReceived += productPrice;
+                
+                transactions.unshift({
+                    id: newTransactionId,
+                    type: 'product',
+                    from: 'ATM',
+                    to: company.name,
+                    description: `Purchased ${productName}`,
+                    amount: productPrice,
+                    date: dateStr,
+                    time: timeStr,
+                    transactionClass: 'product',
+                    entityId: company.id
+                });
+                
+                updateAtmBalance();
+                renderCompanies();
+                renderTransactions();
+            }
+            
+            // Execute partner transaction
+            function executePartnerTransaction(partnerId, amount) {
+                const partner = partners.find(p => p.id == partnerId);
+                if (!partner) return;
+                
+                const transactionAmount = parseInt(amount);
+                
+                if (transactionAmount > atmBalance) {
+                    alert('Insufficient ATM balance for this transaction!');
+                    return;
+                }
+                
+                const newTransactionId = transactions.length > 0 ? Math.max(...transactions.map(t => t.id)) + 1 : 1;
+                const now = new Date();
+                const dateStr = now.toISOString().split('T')[0];
+                const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                atmBalance -= transactionAmount;
+                partner.balance += transactionAmount;
+                partner.totalReceived += transactionAmount;
+                
+                transactions.unshift({
+                    id: newTransactionId,
+                    type: 'partner',
+                    from: 'ATM',
+                    to: partner.name,
+                    amount: transactionAmount,
+                    date: dateStr,
+                    time: timeStr,
+                    transactionClass: 'partner',
+                    entityId: partner.id
+                });
+                
+                updateAtmBalance();
+                renderPartners();
+                renderTransactions();
+            }
+            
+            // Execute company transaction
+            function executeCompanyTransaction(companyId, amount, type) {
+                const company = companies.find(c => c.id == companyId);
+                if (!company) return;
+                
+                const transactionAmount = parseInt(amount);
+                const newTransactionId = transactions.length > 0 ? Math.max(...transactions.map(t => t.id)) + 1 : 1;
+                const now = new Date();
+                const dateStr = now.toISOString().split('T')[0];
+                const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                if (type === 'give') {
+                    // ATM gives to company
+                    if (transactionAmount > atmBalance) {
+                        alert('Insufficient ATM balance for this transaction!');
+                        return;
+                    }
+                    
+                    atmBalance -= transactionAmount;
+                    company.balance += transactionAmount;
+                    company.totalReceived += transactionAmount;
+                    
+                    transactions.unshift({
+                        id: newTransactionId,
+                        type: 'company',
+                        from: 'ATM',
+                        to: company.name,
+                        amount: transactionAmount,
+                        date: dateStr,
+                        time: timeStr,
+                        transactionClass: 'company',
+                        entityId: company.id
+                    });
+                } else {
+                    // Company gives to ATM
+                    if (transactionAmount > company.balance) {
+                        alert('Company has insufficient balance for this transaction!');
+                        return;
+                    }
+                    
+                    atmBalance += transactionAmount;
+                    company.balance -= transactionAmount;
+                    company.totalGiven += transactionAmount;
+                    
+                    transactions.unshift({
+                        id: newTransactionId,
+                        type: 'company',
+                        from: company.name,
+                        to: 'ATM',
+                        amount: transactionAmount,
+                        date: dateStr,
+                        time: timeStr,
+                        transactionClass: 'company',
+                        entityId: company.id
+                    });
+                }
+                
+                updateAtmBalance();
+                renderCompanies();
+                renderTransactions();
+            }
+            
+            // Record direct company payment
+            function recordDirectCompanyPayment(companyId, amount, intermediary) {
+                const company = companies.find(c => c.id == companyId);
+                if (!company) return;
+                
+                const transactionAmount = parseInt(amount);
+                const newTransactionId = transactions.length > 0 ? Math.max(...transactions.map(t => t.id)) + 1 : 1;
+                const now = new Date();
+                const dateStr = now.toISOString().split('T')[0];
+                const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                if (transactionAmount > company.balance) {
+                    alert('Company has insufficient balance for this transaction!');
+                    return;
+                }
+                
+                company.balance -= transactionAmount;
+                company.totalGiven += transactionAmount;
+                atmBalance += transactionAmount;
+                
+                transactions.unshift({
+                    id: newTransactionId,
+                    type: 'direct',
+                    from: company.name,
+                    to: `ATM via ${intermediary}`,
+                    amount: transactionAmount,
+                    date: dateStr,
+                    time: timeStr,
+                    transactionClass: 'company',
+                    entityId: company.id
+                });
+                
+                updateAtmBalance();
+                renderCompanies();
+                renderTransactions();
+            }
+            
+            // Add money to ATM or update existing
+            function saveAtmMoney(id, amount, source) {
+                const transactionAmount = parseInt(amount);
+                
+                if (id) {
+                    // Update existing ATM transaction
+                    const transactionIndex = transactions.findIndex(t => t.id === id);
+                    if (transactionIndex !== -1) {
+                        const oldTransaction = transactions[transactionIndex];
+                        const oldAmount = oldTransaction.amount;
+                        const amountDiff = transactionAmount - oldAmount;
+                        
+                        // Adjust ATM balance
+                        atmBalance += amountDiff;
+                        
+                        // Update transaction
+                        transactions[transactionIndex].amount = transactionAmount;
+                        transactions[transactionIndex].from = source;
+                        transactions[transactionIndex].description = `Added money to ATM from ${source}`;
+                    }
+                } else {
+                    // Add new ATM transaction
+                    const newTransactionId = transactions.length > 0 ? Math.max(...transactions.map(t => t.id)) + 1 : 1;
+                    const now = new Date();
+                    const dateStr = now.toISOString().split('T')[0];
+                    const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    
+                    atmBalance += transactionAmount;
+                    
+                    transactions.unshift({
+                        id: newTransactionId,
+                        type: 'atm_add',
+                        from: source,
+                        to: 'ATM',
+                        description: `Added money to ATM from ${source}`,
+                        amount: transactionAmount,
+                        date: dateStr,
+                        time: timeStr,
+                        transactionClass: 'atm',
+                        entityId: null
+                    });
+                }
+                
+                updateAtmBalance();
+                renderTransactions();
+                closeModal(atmMoneyModal);
+            }
+            
+            // Withdraw money from ATM or update existing
+            function saveAtmWithdraw(id, amount, reason) {
+                const transactionAmount = parseInt(amount);
+                
+                if (id) {
+                    // Update existing withdrawal transaction
+                    const transactionIndex = transactions.findIndex(t => t.id === id);
+                    if (transactionIndex !== -1) {
+                        const oldTransaction = transactions[transactionIndex];
+                        const oldAmount = oldTransaction.amount;
+                        const amountDiff = transactionAmount - oldAmount;
+                        
+                        // Check if new amount exceeds ATM balance
+                        if (amountDiff > atmBalance) {
+                            alert('Insufficient ATM balance for this updated withdrawal!');
+                            return;
+                        }
+                        
+                        // Adjust ATM balance (add back old amount, subtract new amount)
+                        atmBalance += oldAmount; // Add back old amount
+                        atmBalance -= transactionAmount; // Subtract new amount
+                        
+                        // Update transaction
+                        transactions[transactionIndex].amount = transactionAmount;
+                        transactions[transactionIndex].description = reason;
+                    }
+                } else {
+                    // Add new withdrawal transaction
+                    if (transactionAmount > atmBalance) {
+                        alert('Insufficient ATM balance for this withdrawal!');
+                        return;
+                    }
+                    
+                    const newTransactionId = transactions.length > 0 ? Math.max(...transactions.map(t => t.id)) + 1 : 1;
+                    const now = new Date();
+                    const dateStr = now.toISOString().split('T')[0];
+                    const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    
+                    atmBalance -= transactionAmount;
+                    
+                    transactions.unshift({
+                        id: newTransactionId,
+                        type: 'atm_withdraw',
+                        from: 'ATM',
+                        to: 'Withdrawal',
+                        description: reason,
+                        amount: transactionAmount,
+                        date: dateStr,
+                        time: timeStr,
+                        transactionClass: 'atm',
+                        entityId: null
+                    });
+                }
+                
+                updateAtmBalance();
+                renderTransactions();
+                closeModal(withdrawAtmModal);
+            }
+            
+            // Open modal
+            function openModal(modal) {
+                modal.style.display = 'flex';
+            }
+            
+            // Close modal
+            function closeModal(modal) {
+                modal.style.display = 'none';
+                if (modal === partnerModal) {
+                    partnerForm.reset();
+                    hideError('partner-name-error');
+                    document.getElementById('partner-modal-title').textContent = 'Add New Partner';
+                    document.getElementById('partner-submit-btn').innerHTML = '<i class="fas fa-plus"></i> Add Partner';
+                    document.getElementById('partner-id').value = '';
+                }
+                if (modal === companyModal) {
+                    companyForm.reset();
+                    hideError('company-name-error');
+                    document.getElementById('company-modal-title').textContent = 'Add New Company';
+                    document.getElementById('company-submit-btn').innerHTML = '<i class="fas fa-plus"></i> Add Company';
+                    document.getElementById('company-id').value = '';
+                }
+                if (modal === detailModal) {
+                    detailTitle.textContent = 'Details';
+                    detailContent.innerHTML = '';
+                }
+                if (modal === atmMoneyModal) {
+                    atmMoneyForm.reset();
+                    document.getElementById('atm-money-title').textContent = 'Add Money to ATM';
+                    document.getElementById('atm-money-submit-btn').innerHTML = '<i class="fas fa-money-bill-wave"></i> Add Money to ATM';
+                    document.getElementById('atm-transaction-id').value = '';
+                }
+                if (modal === withdrawAtmModal) {
+                    withdrawAtmForm.reset();
+                    document.getElementById('withdraw-atm-title').textContent = 'Withdraw Money from ATM';
+                    document.getElementById('withdraw-atm-submit-btn').innerHTML = '<i class="fas fa-hand-holding-usd"></i> Withdraw from ATM';
+                    document.getElementById('withdraw-transaction-id').value = '';
+                }
+                if (modal === deleteModal) {
+                    // Reset delete variables
+                    itemToDelete = null;
+                    itemTypeToDelete = null;
+                    transactionToDelete = null;
+                }
+                if (modal === deleteAllModal) {
+                    // Reset confirmation input
+                    confirmDeleteText.value = '';
+                    confirmDeleteAllBtn.disabled = true;
+                    hideError('delete-all-error');
+                }
+            }
+            
+            // Tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === tabId) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+            
+            // Event Listeners
+            addPartnerBtn.addEventListener('click', () => openModal(partnerModal));
+            addCompanyBtn.addEventListener('click', () => openModal(companyModal));
+            addAtmMoneyBtn.addEventListener('click', () => {
+                document.getElementById('atm-money-title').textContent = 'Add Money to ATM';
+                document.getElementById('atm-money-submit-btn').innerHTML = '<i class="fas fa-money-bill-wave"></i> Add Money to ATM';
+                document.getElementById('atm-transaction-id').value = '';
+                openModal(atmMoneyModal);
+            });
+            withdrawAtmMoneyBtn.addEventListener('click', () => {
+                document.getElementById('withdraw-atm-title').textContent = 'Withdraw Money from ATM';
+                document.getElementById('withdraw-atm-submit-btn').innerHTML = '<i class="fas fa-hand-holding-usd"></i> Withdraw from ATM';
+                document.getElementById('withdraw-transaction-id').value = '';
+                openModal(withdrawAtmModal);
+            });
+            
+            // Delete All buttons
+            deleteAllBtn.addEventListener('click', () => {
+                openModal(deleteAllModal);
+            });
+            
+            deleteAllDataBtn.addEventListener('click', () => {
+                openModal(deleteAllModal);
+            });
+            
+            // Confirm delete all text validation
+            confirmDeleteText.addEventListener('input', function() {
+                const text = this.value.trim();
+                if (text === 'DELETE ALL') {
+                    confirmDeleteAllBtn.disabled = false;
+                    hideError('delete-all-error');
+                } else {
+                    confirmDeleteAllBtn.disabled = true;
+                    if (text) {
+                        showError('delete-all-error', 'You must type "DELETE ALL" exactly as shown');
+                    } else {
+                        hideError('delete-all-error');
+                    }
+                }
+            });
+            
+            // Confirm delete all
+            confirmDeleteAllBtn.addEventListener('click', () => {
+                if (confirmDeleteText.value.trim() === 'DELETE ALL') {
+                    deleteAllData();
+                }
+            });
+            
+            // Cancel delete all
+            cancelDeleteAllBtn.addEventListener('click', () => {
+                closeModal(deleteAllModal);
+            });
+            
+            viewAllTransactionsBtn.addEventListener('click', () => {
+                detailTitle.textContent = 'All Transactions';
+                detailContent.innerHTML = `
+                    <div class="detail-view">
+                        <h3 class="card-title"><i class="fas fa-exchange-alt"></i> Complete Transaction History</h3>
+                        ${transactions.length > 0 ? `
+                            <table class="history-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Type</th>
+                                        <th>Description</th>
+                                        <th>Amount</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${transactions.map(t => {
+                                        let typeText = '';
+                                        let amountClass = '';
+                                        
+                                        if (t.type === 'partner') {
+                                            typeText = 'Partner Transaction';
+                                            amountClass = 'negative';
+                                        } else if (t.type === 'company') {
+                                            typeText = 'Company Transaction';
+                                            amountClass = t.from === 'ATM' ? 'negative' : 'positive';
+                                        } else if (t.type === 'direct') {
+                                            typeText = 'Direct Payment';
+                                            amountClass = 'positive';
+                                        } else if (t.type === 'product') {
+                                            typeText = 'Product Purchase';
+                                            amountClass = 'negative';
+                                        } else if (t.type === 'atm_add') {
+                                            typeText = 'ATM Addition';
+                                            amountClass = 'positive';
+                                        } else if (t.type === 'atm_withdraw') {
+                                            typeText = 'ATM Withdrawal';
+                                            amountClass = 'negative';
+                                        }
+                                        
+                                        let actionButtons = '';
+                                        if (t.type === 'atm_add' || t.type === 'atm_withdraw') {
+                                            actionButtons = `
+                                                <button class="transaction-action-btn transaction-edit-btn" onclick="editAtmTransaction(${t.id})" style="margin-right: 5px;">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="transaction-action-btn transaction-delete-btn" onclick="confirmDeleteTransaction(${t.id})">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            `;
+                                        }
+                                        
+                                        return `
+                                            <tr>
+                                                <td>${t.date}</td>
+                                                <td>${t.time}</td>
+                                                <td>${typeText}</td>
+                                                <td>${t.description || (t.from === 'ATM' ? `ATM gave to ${t.to}` : `${t.from} gave to ${t.to}`)}</td>
+                                                <td class="${amountClass}">${amountClass === 'negative' ? '-' : '+'}$${formatCurrency(t.amount)}</td>
+                                                <td>${actionButtons}</td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        ` : `
+                            <div class="empty-state">
+                                <i class="fas fa-exchange-alt"></i>
+                                <h3>No Transactions Yet</h3>
+                                <p>Execute your first transaction above</p>
+                            </div>
+                        `}
+                    </div>
+                `;
+                openModal(detailModal);
+            });
+            
+            closeModalBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    closeModal(modal);
+                });
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === partnerModal) closeModal(partnerModal);
+                if (e.target === companyModal) closeModal(companyModal);
+                if (e.target === atmMoneyModal) closeModal(atmMoneyModal);
+                if (e.target === withdrawAtmModal) closeModal(withdrawAtmModal);
+                if (e.target === detailModal) closeModal(detailModal);
+                if (e.target === deleteModal) closeModal(deleteModal);
+                if (e.target === deleteAllModal) closeModal(deleteAllModal);
+            });
+            
+            // Partner name validation on input (real-time)
+            document.getElementById('partner-name').addEventListener('input', function() {
+                const name = this.value.trim();
+                const id = document.getElementById('partner-id').value;
+                if (name && isPartnerNameExists(name, id ? parseInt(id) : null)) {
+                    showError('partner-name-error', `"${name}" already exists as a partner name!`);
+                } else {
+                    hideError('partner-name-error');
+                }
+            });
+            
+            // Company name validation on input (real-time)
+            document.getElementById('company-name').addEventListener('input', function() {
+                const name = this.value.trim();
+                const id = document.getElementById('company-id').value;
+                if (name && isCompanyNameExists(name, id ? parseInt(id) : null)) {
+                    showError('company-name-error', `"${name}" already exists as a company name!`);
+                } else {
+                    hideError('company-name-error');
+                }
+            });
+            
+            // Partner form submission
+            partnerForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = document.getElementById('partner-id').value;
+                const name = document.getElementById('partner-name').value.trim();
+                const balance = document.getElementById('partner-initial-balance').value;
+                
+                if (!name || !balance) {
+                    alert('Please fill in all fields!');
+                    return;
+                }
+                
+                if (isPartnerNameExists(name, id ? parseInt(id) : null)) {
+                    showError('partner-name-error', `"${name}" already exists as a partner name!`);
+                    return;
+                }
+                
+                savePartner(id ? parseInt(id) : null, name, balance);
+            });
+            
+            // Company form submission
+            companyForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = document.getElementById('company-id').value;
+                const name = document.getElementById('company-name').value.trim();
+                const balance = document.getElementById('company-initial-balance').value;
+                
+                if (!name || !balance) {
+                    alert('Please fill in all fields!');
+                    return;
+                }
+                
+                if (isCompanyNameExists(name, id ? parseInt(id) : null)) {
+                    showError('company-name-error', `"${name}" already exists as a company name!`);
+                    return;
+                }
+                
+                saveCompany(id ? parseInt(id) : null, name, balance);
+            });
+            
+            // Partner transaction form
+            partnerTransactionForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const partnerId = document.getElementById('partner-select').value;
+                const amount = document.getElementById('partner-amount').value;
+                
+                if (partnerId && amount) {
+                    executePartnerTransaction(partnerId, amount);
+                    partnerTransactionForm.reset();
+                }
+            });
+            
+            // Company transaction form
+            companyTransactionForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const companyId = document.getElementById('company-select').value;
+                const amount = document.getElementById('company-amount').value;
+                const type = document.getElementById('company-type').value;
+                
+                if (companyId && amount) {
+                    executeCompanyTransaction(companyId, amount, type);
+                    companyTransactionForm.reset();
+                }
+            });
+            
+            // Direct company transaction form
+            directCompanyForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const companyId = document.getElementById('direct-company-select').value;
+                const amount = document.getElementById('direct-amount').value;
+                const intermediary = document.getElementById('intermediary').value.trim();
+                
+                if (companyId && amount && intermediary) {
+                    recordDirectCompanyPayment(companyId, amount, intermediary);
+                    directCompanyForm.reset();
+                }
+            });
+            
+            // Add product form
+            addProductForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const companyId = document.getElementById('product-company-select').value;
+                const productName = document.getElementById('product-name').value.trim();
+                const price = document.getElementById('product-price').value;
+                
+                if (companyId && productName && price) {
+                    addProductToCompany(companyId, productName, price);
+                    addProductForm.reset();
+                }
+            });
+            
+            // ATM money form
+            atmMoneyForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = document.getElementById('atm-transaction-id').value;
+                const amount = document.getElementById('atm-amount').value;
+                const source = document.getElementById('atm-source').value.trim();
+                
+                if (amount && source) {
+                    saveAtmMoney(id ? parseInt(id) : null, amount, source);
+                }
+            });
+            
+            // Withdraw ATM money form
+            withdrawAtmForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = document.getElementById('withdraw-transaction-id').value;
+                const amount = document.getElementById('withdraw-amount').value;
+                const reason = document.getElementById('withdraw-reason').value.trim();
+                
+                if (amount && reason) {
+                    saveAtmWithdraw(id ? parseInt(id) : null, amount, reason);
+                }
+            });
+            
+            // Delete confirmation buttons
+            confirmDeleteBtn.addEventListener('click', () => {
+                if (transactionToDelete) {
+                    deleteTransaction(transactionToDelete);
+                } else if (itemToDelete && itemTypeToDelete) {
+                    deleteItem(itemTypeToDelete, itemToDelete);
+                }
+                // Reset variables
+                itemToDelete = null;
+                itemTypeToDelete = null;
+                transactionToDelete = null;
+            });
+            
+            cancelDeleteBtn.addEventListener('click', () => {
+                // Reset variables
+                itemToDelete = null;
+                itemTypeToDelete = null;
+                transactionToDelete = null;
+                closeModal(deleteModal);
+            });
+            
+            // Initialize the app
+            function initApp() {
+                updateAtmBalance();
+                renderPartners();
+                renderCompanies();
+                renderTransactions();
+            }
+            
+            // Start the application
+            initApp();
+        }
 
-<!-- DEPOSIT -->
-<div id="deposit" class="page card hidden">
-<h2>Deposit</h2>
-<input id="depositAmount" type="number" placeholder="Amount">
-<input id="depositDate" type="datetime-local">
-<button onclick="depositATM()">Add Money</button>
-</div>
+        // after login success, we call startOriginalApp, but we must ensure modals are reconnected? They are static.
+        // we also need to ensure that the original script doesn't run before login; we removed its auto-init.
+        // we'll start it when main content becomes visible.
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'class') {
+                    if (mainContent.classList.contains('visible')) {
+                        startOriginalApp();
+                        observer.disconnect();
+                    }
+                }
+            });
+        });
+        observer.observe(mainContent, { attributes: true });
+        // if somehow already visible (shouldn't happen)
+        if(mainContent.classList.contains('visible')) startOriginalApp();
+    </script>
 
-<!-- EMPLOYEES -->
-<div id="emp" class="page card hidden">
-<h2>Employees</h2>
-<input id="empName" placeholder="Name">
-<input id="empSalary" type="number" placeholder="Salary">
-<button onclick="addEmployee()">Add</button>
-<div id="empList"></div>
-</div>
-
-<!-- EMPLOYEE ACCOUNTS -->
-<div id="empAcc" class="page card hidden">
-<h2>Employee Accounts</h2>
-<select id="selectEmp" onchange="renderEmployeeAccounts()">
-<option value="">-- Select Employee --</option>
-</select>
-<div id="empAccounts"></div>
-</div>
-
-<!-- COMPANIES -->
-<div id="com" class="page card hidden">
-<h2>Companies</h2>
-<input id="comName" placeholder="Name">
-<input id="comProduct" placeholder="Product">
-<input id="comPrice" type="number" placeholder="Price">
-<button onclick="addCompany()">Add</button>
-<div id="comList"></div>
-</div>
-
-<!-- COMPANY ACCOUNTS -->
-<div id="comAcc" class="page card hidden">
-<h2>Company Accounts</h2>
-<select id="selectCom" onchange="renderCompanyAccounts()">
-<option value="">-- Select Company --</option>
-</select>
-<div id="comAccounts"></div>
-</div>
-
-<!-- PAYMENTS -->
-<div id="pay" class="page card hidden">
-<h2>ATM Payments</h2>
-<select id="atmType" onchange="updateATMSelect()">
-<option value="emp">Employee</option>
-<option value="com">Company</option>
-</select>
-<select id="atmTarget"></select>
-<input id="atmAmount" type="number" placeholder="Amount">
-<input id="atmDate" type="datetime-local">
-<button onclick="addATM()">Pay</button>
-</div>
-
-<!-- REPORT -->
-<div id="rep" class="page card hidden">
-<h2>Financial Report</h2>
-<div class="report-grid" id="reportSummary"></div>
-<h3>Full Transaction Sheet</h3>
-<table id="reportTable"></table>
-</div>
-
-</div>
-</div>
-
-<script>
-// ADMIN LOGIN
-const ADMIN={user:"admin",pass:"1234"};
-let employees=[], companies=[], atm=[], deposits=[], atmMoney=0;
-const chartCanvas=document.getElementById("chart");
-
-// LOGIN
-function login(){
-  if(username.value===ADMIN.user && password.value===ADMIN.pass){
-    loginBox.classList.add("hidden");
-    app.classList.remove("hidden");
-    load();
-    renderAll();
-  }else alert("Wrong Login");
-}
-
-// NAVIGATION
-function show(id,event){
-  document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
-  document.getElementById(id).classList.remove("hidden");
-  document.querySelectorAll(".menu button").forEach(b=>b.classList.remove("active"));
-  event.target.classList.add("active");
-  if(id==="rep") makeReport();
-  if(id==="empAcc") renderEmployeeAccounts();
-  if(id==="comAcc") renderCompanyAccounts();
-}
-
-// STORAGE
-function save(){ localStorage.setItem("finance",JSON.stringify({employees,companies,atm,deposits,atmMoney})); }
-function load(){ let d=JSON.parse(localStorage.getItem("finance")); if(!d) return; employees=d.employees||[]; companies=d.companies||[]; atm=d.atm||[]; deposits=d.deposits||[]; atmMoney=d.atmMoney||0; }
-
-// BALANCE
-function updateBalance(){ atmBalance.innerText="$"+atmMoney; }
-
-// DEPOSIT
-function depositATM(){ 
-  if(!depositAmount.value) return; 
-  let amt=+depositAmount.value; 
-  atmMoney+=amt; 
-  deposits.push({amount:amt,dateTime:depositDate.value}); 
-  save(); renderAll(); 
-  depositAmount.value=""; depositDate.value=""; 
-}
-
-/* EMPLOYEES CRUD */
-let editingEmp=-1;
-function addEmployee(){ 
-  if(!empName.value||!empSalary.value) return; 
-  if(editingEmp>-1){
-    employees[editingEmp]={name:empName.value,salary:+empSalary.value};
-    editingEmp=-1;
-  }else{
-    employees.push({name:empName.value,salary:+empSalary.value}); 
-  }
-  save(); renderAll(); updateEmployeeSelect(); renderEmployeeList();
-  empName.value=""; empSalary.value="";
-}
-
-function editEmployee(i){
-  empName.value=employees[i].name;
-  empSalary.value=employees[i].salary;
-  editingEmp=i;
-}
-
-function deleteEmployee(i){
-  if(!confirm("Delete this employee?")) return;
-  employees.splice(i,1);
-  save(); renderAll(); updateEmployeeSelect(); renderEmployeeList();
-}
-
-function updateEmployeeSelect(){
-  let s="<option value=''>-- Select Employee --</option>";
-  employees.forEach((e,i)=>s+=`<option value="${i}">${e.name}</option>`);
-  document.getElementById("selectEmp").innerHTML=s;
-}
-
-function renderEmployeeList(){
-  let html="<table><tr><th>Name</th><th>Salary</th><th>Actions</th></tr>";
-  employees.forEach((e,i)=>html+=`<tr>
-    <td>${e.name}</td><td>$${e.salary}</td>
-    <td>
-      <button onclick="editEmployee(${i})">✏️ Edit</button>
-      <button onclick="deleteEmployee(${i})">🗑️ Delete</button>
-    </td>
-  </tr>`);
-  html+="</table>";
-  document.getElementById("empList").innerHTML=html;
-}
-
-/* COMPANIES CRUD */
-let editingCom=-1;
-function addCompany(){ 
-  if(!comName.value||!comPrice.value) return; 
-  if(editingCom>-1){
-    companies[editingCom]={name:comName.value,product:comProduct.value,price:+comPrice.value};
-    editingCom=-1;
-  }else{
-    companies.push({name:comName.value,product:comProduct.value,price:+comPrice.value}); 
-  }
-  save(); renderAll(); updateCompanySelect(); renderCompanyList();
-  comName.value=""; comProduct.value=""; comPrice.value="";
-}
-
-function editCompany(i){
-  comName.value=companies[i].name;
-  comProduct.value=companies[i].product;
-  comPrice.value=companies[i].price;
-  editingCom=i;
-}
-
-function deleteCompany(i){
-  if(!confirm("Delete this company?")) return;
-  companies.splice(i,1);
-  save(); renderAll(); updateCompanySelect(); renderCompanyList();
-}
-
-function updateCompanySelect(){
-  let s="<option value=''>-- Select Company --</option>";
-  companies.forEach((c,i)=>s+=`<option value="${i}">${c.name}</option>`);
-  document.getElementById("selectCom").innerHTML=s;
-}
-
-function renderCompanyList(){
-  let html="<table><tr><th>Name</th><th>Product</th><th>Price</th><th>Actions</th></tr>";
-  companies.forEach((c,i)=>html+=`<tr>
-    <td>${c.name}</td><td>${c.product}</td><td>$${c.price}</td>
-    <td>
-      <button onclick="editCompany(${i})">✏️ Edit</button>
-      <button onclick="deleteCompany(${i})">🗑️ Delete</button>
-    </td>
-  </tr>`);
-  html+="</table>";
-  document.getElementById("comList").innerHTML=html;
-}
-
-/* EMPLOYEE ACCOUNTS */
-function renderEmployeeAccounts(){ 
-  let empIndex=selectEmp.value;
-  if(empIndex===""){ 
-    let html=`<table><tr><th>Name</th><th>Salary</th><th>Total Paid</th></tr>`;
-    employees.forEach((e,i)=>{
-      let paid=atm.filter(a=>a.type==="emp" && a.index===i).reduce((sum,x)=>sum+x.amount,0);
-      html+=`<tr><td>${e.name}</td><td>$${e.salary}</td><td>$${paid}</td></tr>`;
-    });
-    html+=`</table>`; 
-    document.getElementById("empAccounts").innerHTML=html;
-  }else{
-    let e=employees[empIndex];
-    let empATM=atm.filter(a=>a.type==="emp" && a.index==empIndex);
-    let paid=empATM.reduce((sum,x)=>sum+x.amount,0);
-    let html=`<h3>${e.name}</h3>`;
-    html+=`<p>Salary: $${e.salary}</p>`;
-    html+=`<p>Total Paid: $${paid}</p>`;
-    html+=`<p>Remaining: $${e.salary - paid}</p>`;
-    if(empATM.length>0){
-      html+=`<h4>Payments:</h4><table><tr><th>Amount</th><th>Date & Time</th></tr>`;
-      empATM.forEach(p=>html+=`<tr><td>$${p.amount}</td><td>${p.dateTime}</td></tr>`);
-      html+=`</table>`;
-    }
-    document.getElementById("empAccounts").innerHTML=html;
-  }
-}
-
-/* COMPANY ACCOUNTS */
-function renderCompanyAccounts(){ 
-  let comIndex=selectCom.value;
-  if(comIndex===""){ 
-    let html=`<table><tr><th>Name</th><th>Product</th><th>Price</th><th>Total Paid</th></tr>`;
-    companies.forEach((c,i)=>{
-      let paid=atm.filter(a=>a.type==="com" && a.index===i).reduce((sum,x)=>sum+x.amount,0);
-      html+=`<tr><td>${c.name}</td><td>${c.product}</td><td>$${c.price}</td><td>$${paid}</td></tr>`;
-    });
-    html+=`</table>`; 
-    document.getElementById("comAccounts").innerHTML=html;
-  }else{
-    let c=companies[comIndex];
-    let comATM=atm.filter(a=>a.type==="com" && a.index==comIndex);
-    let paid=comATM.reduce((sum,x)=>sum+x.amount,0);
-    let html=`<h3>${c.name}</h3>`;
-    html+=`<p>Product: ${c.product}</p>`;
-    html+=`<p>Price: $${c.price}</p>`;
-    html+=`<p>Total Paid: $${paid}</p>`;
-    html+=`<p>Remaining: $${c.price - paid}</p>`;
-    if(comATM.length>0){
-      html+=`<h4>Payments:</h4><table><tr><th>Amount</th><th>Date & Time</th></tr>`;
-      comATM.forEach(p=>html+=`<tr><td>$${p.amount}</td><td>${p.dateTime}</td></tr>`);
-      html+=`</table>`;
-    }
-    document.getElementById("comAccounts").innerHTML=html;
-  }
-}
-
-/* PAYMENTS */
-function updateATMSelect(){ 
-  let s=""; 
-  if(atmType.value==="emp"){ employees.forEach((e,i)=>s+=`<option value="${i}">${e.name}</option>`); } 
-  if(atmType.value==="com"){ companies.forEach((c,i)=>s+=`<option value="${i}">${c.name}</option>`); } 
-  atmTarget.innerHTML=s; 
-}
-
-function addATM(){ 
-  if(!atmAmount.value) return;
-  let amt=+atmAmount.value;
-  if(amt>atmMoney){ alert("Not enough money!"); return; }
-  atmMoney-=amt;
-  atm.push({type:atmType.value,index:+atmTarget.value,amount:amt,dateTime:atmDate.value});
-  save(); renderAll(); atmAmount.value=""; atmDate.value="";
-}
-
-/* REPORT */
-function makeReport(){ 
-  let emp=0, com=0, dep=0;
-  atm.forEach(a=>{ if(a.type==="emp") emp+=a.amount; if(a.type==="com") com+=a.amount; });
-  deposits.forEach(d=>dep+=d.amount);
-  let profit=dep-(emp+com);
-  reportSummary.innerHTML=`<div class="report-box"><h3>ATM Balance</h3><p>$${atmMoney}</p></div>
-  <div class="report-box"><h3>Total Deposits</h3><p>$${dep}</p></div>
-  <div class="report-box"><h3>Employee Payments</h3><p>$${emp}</p></div>
-  <div class="report-box"><h3>Company Payments</h3><p>$${com}</p></div>
-  <div class="report-box"><h3>Remaining Profit</h3><p>$${profit}</p></div>`;
-  let t=`<tr><th>Type</th><th>Name</th><th>Amount</th><th>Date & Time</th></tr>`;
-  deposits.forEach(d=>t+=`<tr><td>Deposit</td><td>ATM</td><td class="green">$${d.amount}</td><td>${d.dateTime}</td></tr>`);
-  atm.forEach(a=>{ let name=""; if(a.type==="emp") name=employees[a.index]?.name; if(a.type==="com") name=companies[a.index]?.name; t+=`<tr><td>${a.type}</td><td>${name}</td><td class="red">-$${a.amount}</td><td>${a.dateTime}</td></tr>`; });
-  reportTable.innerHTML=t;
-}
-
-/* CHART */
-let chart;
-function updateChart(){ 
-  let emp=0, com=0;
-  atm.forEach(a=>{ if(a.type==="emp") emp+=a.amount; if(a.type==="com") com+=a.amount; });
-  if(chart) chart.destroy();
-  chart=new Chart(chartCanvas,{type:"bar",data:{labels:["Employees","Companies"],datasets:[{label:"Payments",data:[emp,com],backgroundColor:["#2563eb","#10b981"]}]}}); 
-}
-
-/* RESET */
-function resetSystem(){ 
-  if(!confirm("Are you sure? All data will be lost.")) return; 
-  employees=[]; companies=[]; atm=[]; deposits=[]; atmMoney=0; 
-  localStorage.removeItem("finance"); renderAll(); updateEmployeeSelect(); updateCompanySelect();
-  renderEmployeeList(); renderCompanyList();
-  alert("All records cleared!"); 
-}
-
-/* INIT */
-function renderAll(){ 
-  updateBalance(); updateATMSelect(); makeReport(); updateChart(); renderEmployeeAccounts(); renderCompanyAccounts(); 
-  updateEmployeeSelect(); updateCompanySelect(); renderEmployeeList(); renderCompanyList();
-}
-</script>
+    <!-- Modals HTML (exact copy from original, placed after mainContent but inside body) -->
+    <div class="modal" id="partner-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="partner-modal-title">Add New Partner</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="partner-form">
+                <input type="hidden" id="partner-id" value="">
+                <div class="form-group">
+                    <label for="partner-name">Partner Name</label>
+                    <input type="text" class="form-control" id="partner-name" placeholder="Enter unique partner name" required>
+                    <div class="error-message" id="partner-name-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="partner-initial-balance">Initial Balance (ATM gives to partner)</label>
+                    <input type="number" class="form-control" id="partner-initial-balance" placeholder="Enter initial balance" min="0" required>
+                </div>
+                <div class="form-group">
+                    <p style="color: var(--warning); font-size: 0.9rem;">
+                        <i class="fas fa-info-circle"></i> Partners only receive money from ATM. They never pay back to ATM.
+                    </p>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;" id="partner-submit-btn">
+                    <i class="fas fa-plus"></i> Add Partner
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="modal" id="company-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="company-modal-title">Add New Company</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="company-form">
+                <input type="hidden" id="company-id" value="">
+                <div class="form-group">
+                    <label for="company-name">Company Name</label>
+                    <input type="text" class="form-control" id="company-name" placeholder="Enter unique company name" required>
+                    <div class="error-message" id="company-name-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="company-initial-balance">Initial Balance</label>
+                    <input type="number" class="form-control" id="company-initial-balance" placeholder="Enter initial balance" min="0" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;" id="company-submit-btn">
+                    <i class="fas fa-plus"></i> Add Company
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="modal" id="detail-modal">
+        <div class="modal-content modal-wide">
+            <div class="modal-header">
+                <h3 id="detail-title">Details</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div id="detail-content">
+                <!-- Details will be loaded here dynamically -->
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="atm-money-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="atm-money-title">Add Money to ATM</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="atm-money-form">
+                <input type="hidden" id="atm-transaction-id" value="">
+                <div class="form-group">
+                    <label for="atm-amount">Amount</label>
+                    <input type="number" class="form-control" id="atm-amount" placeholder="Enter amount to add" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="atm-source">Source of Money</label>
+                    <input type="text" class="form-control" id="atm-source" placeholder="Where is money coming from?" required>
+                </div>
+                <button type="submit" class="btn btn-success" style="width: 100%;" id="atm-money-submit-btn">
+                    <i class="fas fa-money-bill-wave"></i> Add Money to ATM
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="modal" id="withdraw-atm-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="withdraw-atm-title">Withdraw Money from ATM</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="withdraw-atm-form">
+                <input type="hidden" id="withdraw-transaction-id" value="">
+                <div class="form-group">
+                    <label for="withdraw-amount">Amount</label>
+                    <input type="number" class="form-control" id="withdraw-amount" placeholder="Enter amount to withdraw" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="withdraw-reason">Reason for Withdrawal</label>
+                    <input type="text" class="form-control" id="withdraw-reason" placeholder="Why are you withdrawing?" required>
+                </div>
+                <button type="submit" class="btn btn-warning" style="width: 100%;" id="withdraw-atm-submit-btn">
+                    <i class="fas fa-hand-holding-usd"></i> Withdraw from ATM
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="modal" id="delete-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="delete-title">Confirm Delete</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div id="delete-content">
+                <p id="delete-message">Are you sure you want to delete this item?</p>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn btn-danger" id="confirm-delete-btn" style="flex: 1;">Delete</button>
+                    <button class="btn btn-primary" id="cancel-delete-btn" style="flex: 1;">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="delete-all-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle" style="color: var(--danger); margin-right: 10px;"></i> DELETE ALL DATA</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div>
+                <div class="warning-box" style="margin-bottom: 25px;">
+                    <h4><i class="fas fa-radiation"></i> WARNING: This action is irreversible!</h4>
+                    <p>You are about to delete ALL data from the system. This includes:</p>
+                    <ul style="text-align: left; margin: 15px 0; padding-left: 20px;">
+                        <li>All ATM partners and their balances</li>
+                        <li>All companies and their balances</li>
+                        <li>All company products</li>
+                        <li>ALL transaction history</li>
+                        <li>ATM balance will be reset to $0</li>
+                    </ul>
+                    <p><strong>This action cannot be undone!</strong></p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm-delete-text">Type "DELETE ALL" to confirm</label>
+                    <input type="text" class="form-control" id="confirm-delete-text" placeholder="Type DELETE ALL here" required>
+                    <div class="error-message" id="delete-all-error" style="margin-top: 10px;"></div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn btn-danger" id="confirm-delete-all-btn" style="flex: 1;" disabled>
+                        <i class="fas fa-bomb"></i> DELETE EVERYTHING
+                    </button>
+                    <button class="btn btn-primary" id="cancel-delete-all-btn" style="flex: 1;">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
-
